@@ -1,0 +1,20 @@
+
+services:
+  app:
+    image: php:8.4-fpm
+    container_name: alizo
+    working_dir: /var/www
+    volumes:
+      - ./src:/var/www
+
+  web:
+    image: nginx:alpine
+    container_name: alizo_web
+    ports:
+      - "80:80"
+    volumes:
+      - ./src:/var/www
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+
