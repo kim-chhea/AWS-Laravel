@@ -64,7 +64,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
-    timeout-minutes: 10
+    timeout-minutes: 8
 
     steps:
       - name: Deploy to server
@@ -75,18 +75,27 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             set -e
+            echo "=== Starting deployment ==="
             cd ${{ secrets.APP_PATH }}
-            echo "=== Pulling latest code ==="
+            echo "=== Resetting git ==="
             git fetch origin
             git reset --hard origin/main
+            git clean -fd
             echo "=== Stopping containers ==="
             docker compose down || true
+            docker system prune -f || true
             echo "=== Building containers ==="
-            timeout 300 docker compose build --no-cache || echo "Build failed, continuing..."
+            timeout 240 docker compose build --no-cache || (echo "Build failed" && exit 1)
             echo "=== Starting containers ==="
-            timeout 120 docker compose up -d || echo "Up failed, continuing..."
-            echo "=== Waiting for containers ==="
-            sleep 10
-            echo "=== Container Status ==="
-            docker compose ps || true
-            echo "=== Deployment complete ==="
+            timeout 60 docker compose up -d || (echo "Start failed" && exit 1)
+            echo "=== Waiting for services ==="
+            sleep 15
+            echo "=== Checking container health ==="
+            docker compose ps
+            if docker compose exec -T app echo "PHP container is running" 2>/dev/null; then
+              echo "✅ PHP container is healthy"
+            else
+              echo "❌ PHP container is not responding"
+              exit 1
+            fi
+            echo "=== Deployment successful ==="
