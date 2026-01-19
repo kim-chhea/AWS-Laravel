@@ -41,6 +41,8 @@ jobs:
 
       - name: Run tests
         run: php artisan test
+        env:
+          APP_KEY: base64:abcdefghijklmnopqrstuvwxy1234567890abcdefghij=
         continue-on-error: true
 
   deploy:
