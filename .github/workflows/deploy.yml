@@ -78,6 +78,7 @@ jobs:
             echo "=== Starting deployment ==="
             cd ${{ secrets.APP_PATH }}
             echo "=== Resetting git ==="
+            sudo chown -R $USER:$USER . || true
             git fetch origin
             git reset --hard origin/main
             git clean -fd
