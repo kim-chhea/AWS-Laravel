@@ -1,12 +1,12 @@
 services:
   app:
-    image: php:8.4-fpm
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: alizo
     working_dir: /var/www
     volumes:
       - ./src:/var/www
-    ports:
-      - "9000:9000"
     depends_on:
       - db
 
