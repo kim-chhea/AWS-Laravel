@@ -20,22 +20,32 @@ jobs:
           php-version: '8.4'
 
       - name: Install PHP dependencies
-        run: composer install --no-progress --prefer-dist --optimize-autoloader
+        run: |
+          cd src
+          composer install --no-progress --prefer-dist --optimize-autoloader
 
       - name: Generate app key
-        run: php artisan key:generate
+        run: |
+          cd src
+          php artisan key:generate
 
       - name: Install Node.js dependencies
         uses: actions/setup-node@v4
         with:
           node-version: '18'
-      - run: npm install
+      - run: |
+          cd src
+          npm install
 
       - name: Build assets
-        run: npm run build
+        run: |
+          cd src
+          npm run build
 
       - name: Run tests
-        run: php artisan test
+        run: |
+          cd src
+          php artisan test
 
   deploy:
     needs: build
