@@ -27,6 +27,7 @@ jobs:
       - name: Generate app key
         run: |
           cd src
+          cp .env.example .env
           php artisan key:generate
 
       - name: Install Node.js dependencies
