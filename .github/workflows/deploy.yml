@@ -27,13 +27,7 @@ jobs:
           composer install --no-progress --prefer-dist --optimize-autoloader
 
       - name: Generate app key
-        run: |
-          cd src
-          cat <<EOF > .env
-          APP_ENV=testing
-          APP_KEY=
-          EOF
-          php artisan key:generate
+        run: cd src && echo 'APP_ENV=testing' > .env && echo 'APP_KEY=base64:testkey' >> .env
 
       - name: Install Node.js dependencies
         uses: actions/setup-node@v4
