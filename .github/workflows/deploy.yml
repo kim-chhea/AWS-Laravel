@@ -75,5 +75,17 @@ jobs:
           script: |
             cd ${{ secrets.APP_PATH }}
             git pull origin main
+            cd src
+            if [ ! -f .env ]; then
+              cp .env.example .env
+              php artisan key:generate
+            fi
+            cd ..
             docker compose down
-            docker compose up -d --build
+            docker compose build --no-cache
+            docker compose up -d
+            docker compose exec -T app chmod -R 775 storage bootstrap/cache
+            docker compose exec -T app chown -R www-data:www-data storage bootstrap/cache
+            sleep 5
+            docker compose ps
+            docker compose logs app --tail=50
